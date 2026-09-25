@@ -49,6 +49,12 @@ dependencies {
     androidTestImplementation(libs.kotlinx.serialization.json)
 }
 
+// Every test targets a known bug, so CI passes -PignoreTestFailures: the build then fails only on setup problems,
+// and the test results are published as a separate check.
+if (providers.gradleProperty("ignoreTestFailures").isPresent) {
+    tasks.named { it == "connectedDebugAndroidTest" }.configureEach { (this as VerificationTask).ignoreFailures = true }
+}
+
 // The app under test is a prebuilt APK: -Paut=<path to it> installs it before the tests run.
 providers.gradleProperty("aut").orNull?.let { aut ->
     val installAut = tasks.register<Exec>("installAut") {
