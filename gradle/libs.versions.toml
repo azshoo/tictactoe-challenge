@@ -1,0 +1,28 @@
+[versions]
+agp = "9.4.1"
+junit = "4.13.2"
+androidxJunit = "1.2.1"
+testRunner = "1.6.2"
+testServices = "1.5.0"
+uiautomator = "2.3.0"
+opencv = "4.10.0"
+truth = "1.4.4"
+snakeyaml = "2.7"
+kotlin = "2.2.10"
+kotlinxSerialization = "1.9.0"
+
+[libraries]
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
+androidx-test-runner = { group = "androidx.test", name = "runner", version.ref = "testRunner" }
+androidx-test-services-storage = { group = "androidx.test.services", name = "storage", version.ref = "testServices" }
+androidx-test-services = { group = "androidx.test.services", name = "test-services", version.ref = "testServices" }
+androidx-uiautomator = { group = "androidx.test.uiautomator", name = "uiautomator", version.ref = "uiautomator" }
+opencv = { group = "org.opencv", name = "opencv", version.ref = "opencv" }
+truth = { group = "com.google.truth", name = "truth", version.ref = "truth" }
+snakeyaml = { group = "org.yaml", name = "snakeyaml", version.ref = "snakeyaml" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

@@ -1,0 +1,11 @@
+app: com.qatest.xo_qa_challenge
+activity: .MainActivity
+orientation: portrait
+
+board_size: 3
+
+wait_timeout: 1000
+move_timeout: 600
+score_timeout: 1000
+launch_timeout: 10000
+max_scrolls: 10

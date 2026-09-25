@@ -1,0 +1,18 @@
+[
+  {"winner": "X", "name": "row 1", "winningLine": [[1, 1], [1, 2], [1, 3]], "moves": [[1, 1], [2, 1], [1, 2], [2, 2], [1, 3]]},
+  {"winner": "X", "name": "row 2", "winningLine": [[2, 1], [2, 2], [2, 3]], "moves": [[2, 1], [1, 1], [2, 2], [1, 2], [2, 3]]},
+  {"winner": "X", "name": "row 3", "winningLine": [[3, 1], [3, 2], [3, 3]], "moves": [[3, 1], [1, 1], [3, 2], [1, 2], [3, 3]]},
+  {"winner": "X", "name": "column 1", "winningLine": [[1, 1], [2, 1], [3, 1]], "moves": [[1, 1], [1, 2], [2, 1], [1, 3], [3, 1]]},
+  {"winner": "X", "name": "column 2", "winningLine": [[1, 2], [2, 2], [3, 2]], "moves": [[1, 2], [1, 1], [2, 2], [1, 3], [3, 2]]},
+  {"winner": "X", "name": "column 3", "winningLine": [[1, 3], [2, 3], [3, 3]], "moves": [[1, 3], [1, 1], [2, 3], [1, 2], [3, 3]]},
+  {"winner": "X", "name": "diagonal from column 1", "winningLine": [[1, 1], [2, 2], [3, 3]], "moves": [[1, 1], [1, 2], [2, 2], [1, 3], [3, 3]]},
+  {"winner": "X", "name": "diagonal from column 3", "winningLine": [[1, 3], [2, 2], [3, 1]], "moves": [[1, 3], [1, 1], [2, 2], [1, 2], [3, 1]]},
+  {"winner": "O", "name": "row 1", "winningLine": [[1, 1], [1, 2], [1, 3]], "moves": [[2, 1], [1, 1], [2, 2], [1, 2], [3, 1], [1, 3]]},
+  {"winner": "O", "name": "row 2", "winningLine": [[2, 1], [2, 2], [2, 3]], "moves": [[1, 1], [2, 1], [1, 2], [2, 2], [3, 1], [2, 3]]},
+  {"winner": "O", "name": "row 3", "winningLine": [[3, 1], [3, 2], [3, 3]], "moves": [[1, 1], [3, 1], [1, 2], [3, 2], [2, 1], [3, 3]]},
+  {"winner": "O", "name": "column 1", "winningLine": [[1, 1], [2, 1], [3, 1]], "moves": [[1, 2], [1, 1], [1, 3], [2, 1], [3, 2], [3, 1]]},
+  {"winner": "O", "name": "column 2", "winningLine": [[1, 2], [2, 2], [3, 2]], "moves": [[1, 1], [1, 2], [1, 3], [2, 2], [2, 1], [3, 2]]},
+  {"winner": "O", "name": "column 3", "winningLine": [[1, 3], [2, 3], [3, 3]], "moves": [[1, 1], [1, 3], [1, 2], [2, 3], [2, 1], [3, 3]]},
+  {"winner": "O", "name": "diagonal from column 1", "winningLine": [[1, 1], [2, 2], [3, 3]], "moves": [[1, 2], [1, 1], [1, 3], [2, 2], [2, 1], [3, 3]]},
+  {"winner": "O", "name": "diagonal from column 3", "winningLine": [[1, 3], [2, 2], [3, 1]], "moves": [[1, 1], [1, 3], [1, 2], [2, 2], [3, 2], [3, 1]]}
+]

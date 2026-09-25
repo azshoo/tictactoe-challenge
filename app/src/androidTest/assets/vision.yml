@@ -1,0 +1,20 @@
+# Measured on the app. Colour ranges are inclusive OpenCV HSV: H 0..180, S and V 0..255.
+
+x_colors:
+  - {min: [95, 120, 150], max: [120, 255, 255]}
+
+# Red hue wraps around 0, hence two ranges.
+o_colors:
+  - {min: [0, 120, 150], max: [8, 200, 255]}
+  - {min: [172, 120, 150], max: [180, 200, 255]}
+
+# Win line: the same red hue as O but more saturated.
+line_colors:
+  - {min: [0, 201, 150], max: [8, 255, 255]}
+  - {min: [172, 201, 150], max: [180, 255, 255]}
+
+# Share of the cell area in the colour above which a mark or the line counts as present.
+mark_threshold: 0.015
+
+# Share of the cell side cut off each edge before counting colours (cell border and rounded corners).
+cell_inset: 0.08
