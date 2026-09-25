@@ -3,6 +3,7 @@ activity: .MainActivity
 orientation: portrait
 
 board_size: 3
+cell_size_tolerance: 3
 
 wait_timeout: 1000
 move_timeout: 600

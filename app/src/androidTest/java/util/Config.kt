@@ -15,6 +15,7 @@ object Config {
     val ACTIVITY = yaml["activity"] as String
     val ORIENTATION = InstrumentationRegistry.getArguments().getString("orientation") ?: yaml["orientation"] as String
     val BOARD_SIZE = yaml["board_size"] as Int
+    val CELL_SIZE_TOLERANCE = yaml["cell_size_tolerance"] as Int
     val WAIT_TIMEOUT = (yaml["wait_timeout"] as Int).toLong()
     val MOVE_TIMEOUT = (yaml["move_timeout"] as Int).toLong()
     val SCORE_TIMEOUT = (yaml["score_timeout"] as Int).toLong()

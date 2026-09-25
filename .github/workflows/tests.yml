@@ -31,6 +31,7 @@ jobs:
           api-level: 34
           target: google_apis
           arch: x86_64
+          profile: pixel_7
           script: ./gradlew connectedDebugAndroidTest -Paut=app-under-test.apk
 
       - uses: actions/upload-artifact@v7

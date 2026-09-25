@@ -5,6 +5,7 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.Condition
 import androidx.test.uiautomator.Direction
 import androidx.test.uiautomator.UiObject2
+import kotlin.math.abs
 
 /**
  * Finds board cells by [row, col]. The app hides cell content from the accessibility tree, but each cell is a Button
@@ -65,7 +66,10 @@ object CellLocator {
 
     /** The on-screen node of [target] if the whole cell is on screen, else null. */
     fun fullyShown(target: UiObject2): UiObject2? =
-        cellsOnScreen().firstOrNull { it == target }?.takeIf { it.visibleBounds.width() == side && it.visibleBounds.height() == side }
+        cellsOnScreen().firstOrNull { it == target }?.takeIf { isFullSize(it.visibleBounds) }
+
+    /** The app rounds cell sizes, so whole cells differ by a pixel or two; a cell cut off at the screen edge is far smaller. */
+    fun isFullSize(r: Rect) = abs(r.width() - side) <= Config.CELL_SIZE_TOLERANCE && abs(r.height() - side) <= Config.CELL_SIZE_TOLERANCE
 
     /** Cells on screen in rows, top to bottom, each left to right. Cells of a row share its top even when cut off. */
     fun rowsOnScreen(): List<List<UiObject2>> {
