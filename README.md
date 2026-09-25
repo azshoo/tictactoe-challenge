@@ -78,8 +78,8 @@ the launcher is on top is reverted when the app starts.
 ## Limitations and known issues
 
 - **Not tested on real devices.** Developed and run on an Android 17 (API 37) emulator, arm64.
-- **Developed and debugged on macOS.** Linux is supported by `setup.sh` and by the CI workflow, but neither
-  `setup.sh` nor the CI workflow has been run yet. Windows has not been tried; use WSL.
+- **Developed and debugged on macOS.** The CI workflow runs on Linux; `setup.sh` supports Linux but has not been
+  run yet. Windows has not been tried; 
 - **Not optimal in speed.** Finding cells means walking the accessibility tree, and reading them means taking
   screenshots. A test takes 2–8 s, the portrait run about 2 minutes on an emulator.
 - **Landscape is slow**: about 7 minutes. The board does not fit the screen in landscape, and every standard
@@ -106,17 +106,8 @@ the launcher is on top is reverted when the app starts.
 ```
 
 It installs what is missing and leaves the rest as is: a JDK (with SDKMAN), the Android SDK in the standard location,
-and an emulator named `tictactoe`. Start the emulator from Android Studio's Device Manager, or:
-
-```bash
-~/Library/Android/sdk/emulator/emulator -avd tictactoe
-```
-
-(on Linux the SDK is in `~/Android/Sdk`). With Android Studio but no `JAVA_HOME` set, point it to Studio's JDK:
-
-```bash
-export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
-```
+and an emulator named `tictactoe`. Start the emulator from Android Studio's Device Manager, or with the command
+`setup.sh` prints at the end.
 
 ### Run
 
@@ -143,7 +134,7 @@ from the URL in the `AUT_APK_URL` repository secret.
 
 Since every test targets a known bug, the job runs Gradle with `-PignoreTestFailures`: the job fails only if the setup
 or the run itself breaks. The test results are published as a separate **Test results** check with a summary of every
-test, and the reports and failure artifacts are uploaded as the `test-reports` artifact.
+test, and the reports, failure artifacts and the system events log are uploaded as the `test-reports` artifact.
 
 ## Output
 

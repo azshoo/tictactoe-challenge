@@ -27,28 +27,6 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
-      - name: AVD cache
-        uses: actions/cache@v6
-        id: avd-cache
-        with:
-          path: |
-            ~/.android/avd/*
-            ~/.android/adb*
-          key: avd-34-google_apis-x86_64-pixel_7
-
-      - name: Create the AVD and a snapshot for the cache
-        if: steps.avd-cache.outputs.cache-hit != 'true'
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 34
-          target: google_apis
-          arch: x86_64
-          profile: pixel_7
-          force-avd-creation: false
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: false
-          script: echo "Generated AVD snapshot for caching."
-
       - name: Download the app under test
         run: curl -fsSL "$AUT_APK_URL" -o app-under-test.apk
         env:
@@ -60,9 +38,6 @@ jobs:
           target: google_apis
           arch: x86_64
           profile: pixel_7
-          force-avd-creation: false
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
           # The events log records why the system kills a process; it is kept for diagnosing launch problems.
           script: ./gradlew connectedDebugAndroidTest -Paut=app-under-test.apk -PignoreTestFailures; status=$?; adb logcat -b events -d > events-logcat.txt; exit $status
 

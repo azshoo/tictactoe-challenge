@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 # One-time setup for running the tests locally: a JDK, the Android SDK and an emulator.
-# Anything already installed is left as is. Start the emulator from Android Studio's Device Manager,
-# or with: <sdk>/emulator/emulator -avd tictactoe
+# Anything already installed is left as is.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -41,3 +40,4 @@ yes | "$tools/sdkmanager" --licenses >/dev/null
 if ! "$sdk/emulator/emulator" -list-avds | grep -qx tictactoe; then
   echo no | "$tools/avdmanager" create avd -n tictactoe -k "$image" -d pixel_7
 fi
+echo "Start the emulator with: $sdk/emulator/emulator -avd tictactoe"

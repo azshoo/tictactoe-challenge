@@ -49,10 +49,21 @@ dependencies {
     androidTestImplementation(libs.kotlinx.serialization.json)
 }
 
-// Every test targets a known bug, so CI passes -PignoreTestFailures: the build then fails only on setup problems,
-// and the test results are published as a separate check.
+// Every test targets a known bug, so CI passes -PignoreTestFailures: tests that fail on an assertion do not fail the
+// build, and the test results are published as a separate check. The build still fails on setup problems and on
+// tests that could not run their scenario (marked by FailureArtifacts).
 if (providers.gradleProperty("ignoreTestFailures").isPresent) {
-    tasks.named { it == "connectedDebugAndroidTest" }.configureEach { (this as VerificationTask).ignoreFailures = true }
+    val additionalOutput = layout.buildDirectory.dir("outputs/connected_android_test_additional_output")
+    tasks.named { it == "connectedDebugAndroidTest" }.configureEach {
+        (this as VerificationTask).ignoreFailures = true
+        doLast {
+            val broken = additionalOutput.get().asFileTree.matching { include("**/broken.*.txt") }.files
+            if (broken.isNotEmpty()) {
+                throw GradleException("Tests that could not run their scenario:\n" +
+                    broken.joinToString("\n") { it.name.removePrefix("broken.").removeSuffix(".txt") })
+            }
+        }
+    }
 }
 
 // The app under test is a prebuilt APK: -Paut=<path to it> installs it before the tests run.

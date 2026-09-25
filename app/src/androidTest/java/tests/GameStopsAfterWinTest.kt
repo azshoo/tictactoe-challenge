@@ -23,7 +23,7 @@ class GameStopsAfterWinTest {
     fun boardAcceptsNoMovesAfterWin() {
         // Arrange: X wins on column 1 ([1, 1], [2, 1], [3, 1])
         Board.play(listOf(1, 1), listOf(1, 2), listOf(2, 1), listOf(1, 3), listOf(3, 1))
-        check(GameScreen.isWinAnnounced()) { "X should have won on column 1" }
+        GameScreen.assertWinAnnounced()
         val bannerAfterWin = GameScreen.bannerText()
 
         // Act: tap the empty [3, 3]

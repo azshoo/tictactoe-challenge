@@ -10,6 +10,7 @@ import com.qa.tictactoe.util.Config
 import com.qa.tictactoe.util.Device
 import com.qa.tictactoe.util.waitFor
 import java.util.regex.Pattern
+import org.junit.Assert.assertTrue
 
 object GameScreen {
     val BANNER = Pattern.compile(".+'s turn \\([XO]\\)|.+ Wins!|It's a Draw!")
@@ -18,20 +19,14 @@ object GameScreen {
     /** Clears the app's data and starts it: a new game with X to move and 0 : 0. */
     fun launchFresh() {
         check(Device.ui.executeShellCommand("pm clear ${Config.APP}").trim() == "Success") { "Could not clear ${Config.APP} data" }
-        // pm clear reports success while the system is still killing the old process; a launch started then can be
-        // killed with it.
-        check(waitFor(Config.LAUNCH_TIMEOUT) { Device.ui.executeShellCommand("pidof ${Config.APP}").isBlank() }) {
-            "${Config.APP} is still running after pm clear"
-        }
-        // Not `am start -W`: it has no timeout and blocks for minutes when the launching process is killed. Such a
-        // launch is retried once.
+        // pm clear removes the app's task, and the system kills the task's processes later, sometimes the process of
+        // the launch below. `am start -W` would then block for minutes with no timeout, so the launch is not waited
+        // for and is retried once.
         val started = (1..2).any {
             Device.ui.executeShellCommand("am start -n ${Config.APP}/${Config.ACTIVITY}")
             Device.ui.wait(Until.hasObject(By.pkg(Config.APP).desc(BANNER)), Config.LAUNCH_TIMEOUT)
         }
-        check(started) {
-            "${Config.APP} did not start. If it is not installed, pass its APK: ./gradlew connectedDebugAndroidTest -Paut=<path>"
-        }
+        check(started) { "${Config.APP} did not start" }
         // Rotated only once the app is on screen: a rotation set while the launcher is on top is reverted at app start.
         if (Config.ORIENTATION == "landscape") Device.ui.setOrientationLandscape() else Device.ui.setOrientationPortrait()
         check((Device.ui.displayWidth > Device.ui.displayHeight) == (Config.ORIENTATION == "landscape")) {
@@ -44,6 +39,13 @@ object GameScreen {
     fun bannerText(): String = onScreen(By.pkg(Config.APP).desc(BANNER)).contentDescription
 
     fun isWinAnnounced(): Boolean = waitFor(Config.MOVE_TIMEOUT) { bannerText().endsWith(" Wins!") }
+
+    /**
+     * An example of a helper for intermediate assertions: a check on the way to the scenario under test that is not
+     * its subject, kept out of the test body so the test stays Arrange/Act/Assert. It asserts rather than `check`s
+     * because a failure here is a defect of the app, not a broken test.
+     */
+    fun assertWinAnnounced() = assertTrue("The game should announce a win.", isWinAnnounced())
 
     /** Score shown on the score card: X's number is left of "vs", O's number is right of it. */
     fun score(player: String): Int {
