@@ -18,8 +18,18 @@ object GameScreen {
     /** Clears the app's data and starts it: a new game with X to move and 0 : 0. */
     fun launchFresh() {
         check(Device.ui.executeShellCommand("pm clear ${Config.APP}").trim() == "Success") { "Could not clear ${Config.APP} data" }
-        Device.ui.executeShellCommand("am start -W -n ${Config.APP}/${Config.ACTIVITY}")
-        checkNotNull(Device.ui.wait(Until.findObject(By.pkg(Config.APP).desc(BANNER)), Config.LAUNCH_TIMEOUT)) {
+        // pm clear reports success while the system is still killing the old process; a launch started then can be
+        // killed with it.
+        check(waitFor(Config.LAUNCH_TIMEOUT) { Device.ui.executeShellCommand("pidof ${Config.APP}").isBlank() }) {
+            "${Config.APP} is still running after pm clear"
+        }
+        // Not `am start -W`: it has no timeout and blocks for minutes when the launching process is killed. Such a
+        // launch is retried once.
+        val started = (1..2).any {
+            Device.ui.executeShellCommand("am start -n ${Config.APP}/${Config.ACTIVITY}")
+            Device.ui.wait(Until.hasObject(By.pkg(Config.APP).desc(BANNER)), Config.LAUNCH_TIMEOUT)
+        }
+        check(started) {
             "${Config.APP} did not start. If it is not installed, pass its APK: ./gradlew connectedDebugAndroidTest -Paut=<path>"
         }
         // Rotated only once the app is on screen: a rotation set while the launcher is on top is reverted at app start.
