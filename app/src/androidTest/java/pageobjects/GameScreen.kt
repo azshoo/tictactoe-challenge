@@ -45,7 +45,10 @@ object GameScreen {
      * its subject, kept out of the test body so the test stays Arrange/Act/Assert. It asserts rather than `check`s
      * because a failure here is a defect of the app, not a broken test.
      */
-    fun assertWinAnnounced() = assertTrue("The game should announce a win.", isWinAnnounced())
+    fun assertWinAnnounced() {
+        val winAnnounced = isWinAnnounced()
+        assertTrue("Expected a win to be announced, but the banner shows \"${bannerText()}\".", winAnnounced)
+    }
 
     /** Score shown on the score card: X's number is left of "vs", O's number is right of it. */
     fun score(player: String): Int {

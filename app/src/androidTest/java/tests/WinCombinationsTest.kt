@@ -7,6 +7,7 @@ import com.qa.tictactoe.testdata.WIN_CASES
 import com.qa.tictactoe.testdata.WinCase
 import com.qa.tictactoe.util.Config
 import com.qa.tictactoe.util.FailureArtifacts
+import com.qa.tictactoe.util.assert
 import com.qa.tictactoe.util.waitFor
 import org.junit.Before
 import org.junit.Rule
@@ -36,15 +37,16 @@ class WinCombinationsTest(private val case: WinCase) {
         // Act
         Board.play(*case.moves.toTypedArray())
 
-        // Assert
-        expect.withMessage("The win line should cross ${case.name}.").that(Board.isLineCrossed(case.winningLine)).isTrue()
-        expect.withMessage("The game should announce a win.").that(GameScreen.isWinAnnounced()).isTrue()
-        expect.withMessage("The banner should name the winner.").that(GameScreen.bannerText()).isEqualTo("$winnerName Wins!")
-        // Wait first, then build the message: it shows the score as it is after the wait.
+        // Assert. Each check waits first and then builds its message, so the message shows the screen after the wait.
+        expect.assert(Board.isLineCrossed(case.winningLine), "Expected the win line to cross ${case.name}, but it was not found there.")
+        val winAnnounced = GameScreen.isWinAnnounced()
+        expect.assert(winAnnounced, "Expected a win to be announced, got \"${GameScreen.bannerText()}\" instead.")
+        val banner = GameScreen.bannerText()
+        expect.assert(banner == "$winnerName Wins!", "Expected the result banner to name $winnerName, got \"$banner\" instead.")
         val winnerScored = GameScreen.hasScore(case.winner, 1)
-        expect.withMessage("The winner should get 1 point, has ${GameScreen.score(case.winner)}.").that(winnerScored).isTrue()
+        expect.assert(winnerScored, "Expected $winnerName to get 1 point, got ${GameScreen.score(case.winner)} instead.")
         val loserScored = waitFor(Config.SCORE_TIMEOUT) { GameScreen.score(loser) != 0 }
-        expect.withMessage("The loser should get no points, has ${GameScreen.score(loser)}.").that(loserScored).isFalse()
+        expect.assert(!loserScored, "Expected ${GameScreen.name(loser)} to have no points, got ${GameScreen.score(loser)} instead.")
     }
 
     companion object {

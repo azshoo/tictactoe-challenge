@@ -28,7 +28,9 @@ class OccupiedCellTest {
         Board.move(1, 1)
 
         // Assert
-        assertFalse("[1, 1] should stay X.", waitFor(Config.MOVE_TIMEOUT) { Board.cellState(1, 1) != "X" })
-        assertNotEquals("The turn should not pass to X.", "${GameScreen.name("X")}'s turn (X)", GameScreen.bannerText())
+        val overwritten = waitFor(Config.MOVE_TIMEOUT) { Board.cellState(1, 1) != "X" }
+        assertFalse("Expected [1, 1] to stay X, but it shows \"${Board.cellState(1, 1)}\".", overwritten)
+        val banner = GameScreen.bannerText()
+        assertNotEquals("Expected O to keep the turn, but the banner shows \"$banner\".", "${GameScreen.name("X")}'s turn (X)", banner)
     }
 }

@@ -25,8 +25,8 @@ They are written in Kotlin with UiAutomator — the native Android tool, run as 
 with no extra server or driver layer (unlike Appium or Astur). Any other generic mobile automation tool would not
 change the basic approach much.
 
-The app is built with Flutter. With access to the sources and to test builds, Flutter's own tools (`integration_test`,
-Patrol) would be the more natural choice; for a production build they are not an option.
+The app is built with Flutter. For actual dev builds, Flutter's own tools (`integration_test`, Patrol) would be a more
+natural choice, but again, that is optional.
 
 ### Architecture
 
@@ -42,9 +42,8 @@ Patrol) would be the more natural choice; for a production build they are not an
 - **Page object methods are stateless by design.** The tests do not control the app's state, so a page object that
   remembered it (a cached score, a remembered turn) would drift from the real screen. Every method reads the screen
   again. The only state is the board map built by `CellLocator` (see below); it is rebuilt at every app launch.
-- **Locators are not moved to a separate catalogue.** The app gives its elements no test ids, so most locators are
-  descriptions and labels used once. With proper test ids in the accessibility attributes they would belong in a
-  separate catalogue file, for reuse and easier maintenance.
+- **Locators are not moved to a separate catalogue.** With proper test ids in the accessibility attributes they would
+  belong in a separate catalogue file, for reuse and easier maintenance.
 - **Test data** (`testdata/`) — the 16 winning move sequences for `WinCombinationsTest`, in JSON.
 - **Configuration** (`assets/`) — `config.yml` (app package, board size, timeouts, orientation) and `vision.yml`
   (mark and line colours).
@@ -68,22 +67,27 @@ the optimal solution, but it is direct and was verified against the app before t
 310 screenshots classified without a single error.
 
 **Board calibration.** The cells carry no ids, but each cell's accessibility node keeps its identity through scrolling,
-rotation, moves and resets. After every app launch `CellLocator` scrolls through the board once and maps the nodes to
-`[row, col]`. After that, any cell is found by its node wherever the screen is scrolled, and is scrolled fully onto the
+rotation, moves and resets. After every app launch `CellLocator` maps the nodes to `[row, col]`, scrolling down only if the
+board does not fit on the screen. After that, any cell is found by its node wherever the screen is scrolled, and is scrolled fully onto the
 screen before a move or a check.
 
-**Rotation** is done by the test itself, after the app is on screen: on recent Android versions a rotation set while
+**Soft assertions.** A win case checks several things, and every one of them should be reported. The usual tool,
+AssertJ's soft assertions, does not work on Android. The tests use Truth's `Expect`, which collects failures on Android,
+with a small handler of their own, `assert(condition, message)` in `util/SoftAssert.kt`, so that a failed check is
+reported as its message only.
+
+**Rotation** is done by the test itself, after the app is on screen: on Android 15+ emulators a rotation set while
 the launcher is on top is reverted when the app starts.
 
 ## Limitations and known issues
 
-- **Not tested on real devices.** Developed and run on an Android 17 (API 37) emulator, arm64.
-- **Developed and debugged on macOS.** The CI workflow runs on Linux; `setup.sh` supports Linux but has not been
-  run yet. Windows has not been tried; 
+- **Not tested on real devices.** The tests were developed on an arm64 Android 17 (API 37) emulator; CI runs them on
+  an x86_64 one.
+- **Developed and run on macOS.** Not tested on Windows.
 - **Not optimal in speed.** Finding cells means walking the accessibility tree, and reading them means taking
   screenshots. A test takes 2–8 s, the portrait run about 2 minutes on an emulator.
 - **Landscape is slow**: about 7 minutes. The board does not fit the screen in landscape, and every standard
-  UiAutomator scroll step waits about 1.3 s for the screen to settle.
+  UiAutomator scroll step takes about 1.3 s: it waits up to 1 s for the scroll to finish, then 250 ms more.
 - **The colours are measured on this build.** A change of the app's theme or palette needs `vision.yml` measured
   again.
 - **Cells are recognised as the only unlabeled buttons on the screen.** Another unlabeled button would break this.
@@ -91,13 +95,6 @@ the launcher is on top is reverted when the app starts.
   need them raised.
 
 ## Setup and run
-
-### Requirements
-
-- macOS or Linux.
-- A JDK and the Android SDK: either Android Studio, or run `./setup.sh`.
-- A device: an emulator or a phone with USB debugging on, Android 7.0 (API 24) or newer.
-- The app under test as an APK file.
 
 ### Setup
 
@@ -115,15 +112,14 @@ and an emulator named `tictactoe`. Start the emulator from Android Studio's Devi
 ./gradlew connectedDebugAndroidTest -Paut=/absolute/path/to/app.apk
 ```
 
-`-Paut` installs the app under test before the tests run; without it the app must already be on the device. Use an
-absolute path: zsh does not expand `~` inside `-Paut=~/…`.
+`-Paut` installs the app under test before the tests run; without it the app must already be on the device. A relative
+path is resolved from the repository root. `~` is not expanded inside `-Paut=~/…` by bash or zsh; use `$HOME` instead.
 
 Options:
 
 | What | How |
 |---|---|
 | Pick a device when several are connected | `ANDROID_SERIAL=emulator-5554 ./gradlew …` (serials: `adb devices`) |
-| A device over Wi‑Fi | `adb connect <ip>:<port>` first, then use `<ip>:<port>` as the serial |
 | Landscape | `-Pandroid.testInstrumentationRunnerArguments.orientation=landscape` (default: `orientation` in `config.yml`) |
 | One test class | `-Pandroid.testInstrumentationRunnerArguments.class=com.qa.tictactoe.tests.OccupiedCellTest` |
 
@@ -132,9 +128,10 @@ Options:
 `.github/workflows/tests.yml` runs the tests on push on an Android 17 (API 37) Pixel 7 emulator. It downloads the app under test
 from the URL in the `AUT_APK_URL` repository secret.
 
-Since every test targets a known bug, the job runs Gradle with `-PignoreTestFailures`: the job fails only if the setup
-or the run itself breaks. The test results are published as a separate **Test results** check with a summary of every
-test, and the reports, failure artifacts and the system events log are uploaded as the `test-reports` artifact.
+Since every test targets a known bug, the job runs Gradle with `-PignoreTestFailures`. Failed tests do not fail the
+build: the run shows them in the red **Test results** check and in the report. Broken tests and any infrastructure
+problems fail the build. The reports, failure artifacts and the system events log are uploaded as the `test-reports`
+artifact.
 
 ## Output
 
@@ -161,15 +158,11 @@ BUILD FAILED in 2m 9s
 | JUnit XML | `app/build/outputs/androidTest-results/connected/debug/` |
 | Screenshot and UI tree of every failed test | `app/build/outputs/connected_android_test_additional_output/` |
 
-A failure lists everything that went wrong in the scenario, not only the first check. For example, `X wins on row 2`:
+Failure message of `X wins on row 2`:
 
 ```
 3 expectations failed:
-  1. The win line should cross row 2.
-     expected to be true
-  2. The banner should name the winner.
-     expected: Player X Wins!
-     but was : Player O Wins!
-  3. The winner should get 1 point, has 2.
-     expected to be true
+  1. Expected the win line to cross row 2, but it was not found there.
+  2. Expected the result banner to name Player X, got "Player O Wins!" instead.
+  3. Expected Player X to get 1 point, got 2 instead.
 ```

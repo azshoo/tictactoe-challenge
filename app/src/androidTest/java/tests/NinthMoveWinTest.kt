@@ -25,6 +25,7 @@ class NinthMoveWinTest {
         Board.play(listOf(3, 3))
 
         // Assert
-        assertTrue("A win on the 9th move should be announced, not a draw.", GameScreen.isWinAnnounced())
+        val winAnnounced = GameScreen.isWinAnnounced()
+        assertTrue("Expected the 9th-move win to be announced, but the banner shows \"${GameScreen.bannerText()}\".", winAnnounced)
     }
 }

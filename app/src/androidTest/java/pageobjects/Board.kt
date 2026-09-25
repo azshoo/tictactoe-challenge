@@ -18,7 +18,7 @@ object Board {
             val cell = CellLocator.cell(row, col)
             val bounds = cell.visibleBounds
             cell.click()
-            check(waitFor(Config.MOVE_TIMEOUT) { CellVision.mark(Device.screenshot(), bounds) != "" }) { "The move to [$row, $col] was not applied" }
+            check(waitFor(Config.MOVE_TIMEOUT) { CellVision.mark(Device.screenshot(), bounds) != "" }) { "Expected a mark in [$row, $col] after the move, but the cell is still empty" }
         }
     }
 

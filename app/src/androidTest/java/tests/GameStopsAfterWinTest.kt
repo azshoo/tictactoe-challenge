@@ -30,7 +30,9 @@ class GameStopsAfterWinTest {
         Board.move(3, 3)
 
         // Assert
-        assertFalse("[3, 3] should stay empty after the game is over.", waitFor(Config.MOVE_TIMEOUT) { Board.cellState(3, 3) != "" })
-        assertEquals("The result banner should not change.", bannerAfterWin, GameScreen.bannerText())
+        val moveAccepted = waitFor(Config.MOVE_TIMEOUT) { Board.cellState(3, 3) != "" }
+        assertFalse("Expected [3, 3] to stay empty after the game ended, but it shows \"${Board.cellState(3, 3)}\".", moveAccepted)
+        val banner = GameScreen.bannerText()
+        assertEquals("Expected the result banner to stay \"$bannerAfterWin\", but it shows \"$banner\".", bannerAfterWin, banner)
     }
 }
