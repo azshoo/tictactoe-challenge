@@ -129,7 +129,7 @@ Options:
 
 ### CI
 
-`.github/workflows/tests.yml` runs the tests on push on an API 34 Pixel 7 emulator. It downloads the app under test
+`.github/workflows/tests.yml` runs the tests on push on an Android 17 (API 37) Pixel 7 emulator. It downloads the app under test
 from the URL in the `AUT_APK_URL` repository secret.
 
 Since every test targets a known bug, the job runs Gradle with `-PignoreTestFailures`: the job fails only if the setup
