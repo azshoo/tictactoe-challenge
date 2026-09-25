@@ -27,6 +27,18 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v6
 
+      # The runner ships old cmdline-tools whose avdmanager writes target=android-0 for dotted API levels such as
+      # 37.0, and the emulator then boots misconfigured and crash-loops.
+      # https://github.com/ReactiveCircus/android-emulator-runner/issues/482
+      - name: Update SDK cmdline-tools
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "cmdline-tools;latest" > /dev/null
+          # sdkmanager does not overwrite the preinstalled tools; it installs next to them as latest-2.
+          if [ -d "$ANDROID_HOME/cmdline-tools/latest-2" ]; then
+            rm -rf "$ANDROID_HOME/cmdline-tools/latest"
+            mv "$ANDROID_HOME/cmdline-tools/latest-2" "$ANDROID_HOME/cmdline-tools/latest"
+          fi
+
       - name: Download the app under test
         run: curl -fsSL "$AUT_APK_URL" -o app-under-test.apk
         env:
@@ -35,9 +47,10 @@ jobs:
       - uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: "37.0"
-          target: google_apis
+          target: google_apis_ps16k
           arch: x86_64
           profile: pixel_7
+          ram-size: 8192M
           # The events log records why the system kills a process; it is kept for diagnosing launch problems.
           script: ./gradlew connectedDebugAndroidTest -Paut=app-under-test.apk -PignoreTestFailures; status=$?; adb logcat -b events -d > events-logcat.txt; exit $status
 

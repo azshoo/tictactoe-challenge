@@ -34,7 +34,7 @@ fi
 
 abi=$([[ $(uname -m) == arm64 || $(uname -m) == aarch64 ]] && echo arm64-v8a || echo x86_64)
 # The same API level as the CI emulator.
-image="system-images;android-37.0;google_apis;$abi"
+image="system-images;android-37.0;google_apis_ps16k;$abi"
 yes | "$tools/sdkmanager" --licenses >/dev/null
 "$tools/sdkmanager" platform-tools emulator "$image"
 if ! "$sdk/emulator/emulator" -list-avds | grep -qx tictactoe; then
